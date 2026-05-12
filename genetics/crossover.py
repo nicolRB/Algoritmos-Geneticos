@@ -1,15 +1,24 @@
-MAX_WEIGHT = 30
+import random
 
-def calculate_fitness(chromosome, items):
-    total_weight = 0
-    total_score = 0
+from models.chromosome import Chromosome
 
-    for gene, item in zip(chromosome.genes, items):
-        if gene:
-            total_weight += item.weight
-            total_score += item.score
+def single_point_crossover(parent1, parent2):
 
-    if total_weight > MAX_WEIGHT:
-        return 0
+    size = len(parent1.genes)
 
-    return total_score
+    crossover_point = random.randint(1, size - 1)
+
+    child1_genes = (
+        parent1.genes[:crossover_point] +
+        parent2.genes[crossover_point:]
+    )
+
+    child2_genes = (
+        parent2.genes[:crossover_point] +
+        parent1.genes[crossover_point:]
+    )
+
+    child1 = Chromosome(child1_genes)
+    child2 = Chromosome(child2_genes)
+
+    return child1, child2
