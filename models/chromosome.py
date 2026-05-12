@@ -12,3 +12,12 @@ class Chromosome:
             f"Peso={self.total_weight} | "
             f"Pontos={self.total_score}"
         )
+    
+    def copy(self):
+        clone = Chromosome(self.genes.copy())
+
+        clone.fitness = self.fitness
+        clone.total_weight = self.total_weight
+        clone.total_score = self.total_score
+
+        return clone

@@ -3,9 +3,26 @@ from genetics.crossover import single_point_crossover
 from genetics.mutation import mutate
 from genetics.fitness import calculate_fitness
 
-def evolve_population(population, items, mutation_rate):
+def evolve_population(
+    population,
+    items,
+    mutation_rate,
+    elite_size=1
+):
+
+    # Ordena do melhor para o pior
+    sorted_population = sorted(
+        population,
+        key=lambda chromosome: chromosome.fitness,
+        reverse=True
+    )
 
     new_population = []
+
+    # Elitismo
+    for i in range(elite_size):
+        elite = sorted_population[i].copy()
+        new_population.append(elite)
 
     population_size = len(population)
 
@@ -22,11 +39,11 @@ def evolve_population(population, items, mutation_rate):
         mutate(child1, mutation_rate)
         mutate(child2, mutation_rate)
 
-        # Fitness
+        # Recalcula fitness
         calculate_fitness(child1, items)
         calculate_fitness(child2, items)
 
-        # Validação
+        # Apenas filhos válidos
         if child1.total_weight <= 30:
             new_population.append(child1)
 

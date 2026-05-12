@@ -1,30 +1,15 @@
 from data.items import ITEMS
-from genetics.population import create_population
-from genetics.evolution import evolve_population
+from genetics.genetic_algorithm import GeneticAlgorithm
 
-POPULATION_SIZE = 10
-GENERATIONS = 5
-MUTATION_RATE = 0.05
+ga = GeneticAlgorithm(
+    items=ITEMS,
+    population_size=10,
+    generations=20,
+    mutation_rate=0.05,
+    elite_size=1
+)
 
-population = create_population(POPULATION_SIZE, ITEMS)
+best = ga.run()
 
-print("POPULAÇÃO INICIAL\n")
-
-for index, chromosome in enumerate(population):
-
-    print(f"Indivíduo {index + 1}")
-    print(chromosome)
-    print()
-
-for generation in range(GENERATIONS):
-
-    population = evolve_population(
-        population,
-        ITEMS,
-        MUTATION_RATE
-    )
-
-    best = max(population, key=lambda chromosome: chromosome.fitness)
-
-    print(f"\nGERAÇÃO {generation + 1}")
-    print(best)
+print("\nMELHOR SOLUÇÃO FINAL")
+print(best)
