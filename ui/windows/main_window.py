@@ -31,7 +31,6 @@ class MainWindow(ctk.CTk):
         self.create_widgets()
 
     def create_widgets(self):
-
         # Título
         self.title_label = ctk.CTkLabel(
             self,
@@ -76,24 +75,60 @@ class MainWindow(ctk.CTk):
         )
 
         self.generation_label.pack(pady=10)
-
-        # Melhor indivíduo
-        self.best_label = ctk.CTkLabel(
+        
+        # Frame da tabela
+        self.table_frame = ctk.CTkScrollableFrame(
             self,
-            text="Nenhuma população iniciada",
-            font=("Arial", 16),
-            justify="left"
+            width=900,
+            height=400
         )
 
-        self.best_label.pack(pady=20)
+        headers = ["ID", "Genes", "Fitness", "Peso", "Pontos"]
+
+        for col in range(len(headers)):
+            self.table_frame.grid_columnconfigure(col, weight=1)
+
+        for col, text in enumerate(headers):
+
+            self.table_frame.grid_columnconfigure(col, weight=1)
+
+            header_cell = ctk.CTkFrame(
+                self.table_frame,
+                fg_color="#1F1F1F",
+                corner_radius=0,
+                border_width=1,
+                border_color="#555555"
+            )
+
+            header_cell.grid(
+                row=0,
+                column=col,
+                padx=1,
+                pady=1,
+                sticky="nsew"
+            )
+
+            label = ctk.CTkLabel(
+                header_cell,
+                text=text,
+                font=("Arial", 16, "bold"),
+                anchor="center"
+            )
+
+            label.pack(
+                padx=20,
+                pady=12,
+                fill="both",
+                expand=True
+            )
+
+        self.table_frame.pack(pady=20, fill="both", expand=True)
 
     def initialize_population(self):
 
         self.ga.initialize_population()
 
-        best = self.ga.get_best()
-
-        self.update_best_display(best)
+        self.update_population_table()
 
     def next_generation(self):
 
@@ -105,24 +140,13 @@ class MainWindow(ctk.CTk):
             )
             return
         else:
-            best = self.ga.next_generation()
+            self.ga.next_generation()
 
             self.generation_label.configure(
                 text=f"Geração: {self.ga.current_generation}"
             )
 
-            self.update_best_display(best)
-
-    def update_best_display(self, chromosome):
-
-        text = (
-            f"Genes: {chromosome.genes}\n"
-            f"Fitness: {chromosome.fitness}\n"
-            f"Peso: {chromosome.total_weight}\n"
-            f"Pontos: {chromosome.total_score}"
-        )
-
-        self.best_label.configure(text=text)
+            self.update_population_table()
 
     def show_result(self):
         if not self.ga.population:
@@ -136,3 +160,56 @@ class MainWindow(ctk.CTk):
 
         #abre a janela de resultado final com os dados do melhor cromossomo encontrado e move a janela para frente
         result_window.ResultWindow(self, best)
+
+    def update_population_table(self):
+
+        # Remove linhas antigas
+        for widget in self.table_frame.winfo_children():
+
+            info = widget.grid_info()
+
+            if info["row"] != 0:
+                widget.destroy()
+
+        # Cria linhas da população
+        for row, chromosome in enumerate(self.ga.population, start=1):
+
+            values = [
+                row - 1,
+                str(chromosome.genes),
+                chromosome.fitness,
+                chromosome.total_weight,
+                chromosome.total_score
+            ]
+
+            for col, value in enumerate(values):
+
+                cell = ctk.CTkFrame(
+                    self.table_frame,
+                    fg_color="#2B2B2B",
+                    corner_radius=0,
+                    border_width=1,
+                    border_color="#444444"
+                )
+
+                cell.grid(
+                    row=row,
+                    column=col,
+                    padx=1,
+                    pady=1,
+                    sticky="nsew"
+                )
+
+                label = ctk.CTkLabel(
+                    cell,
+                    text=str(value),
+                    font=("Arial", 14),
+                    anchor="center"
+                )
+
+                label.pack(
+                    padx=20,
+                    pady=10,
+                    fill="both",
+                    expand=True
+                )
